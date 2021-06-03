@@ -100,13 +100,19 @@ void main()
 			}
 
 		}
-		Dom_Copy.coef;
 		Nom_Copy = Dom_Copy;
 
-
-
-
-
 	}
+	for (int i = 0; i < 4-(Nom.power[0]-Division_Result.power[0]); i++)
+	{
+		printf("%dX*%d \t", Division_Result.coef[i], Division_Result.power[i]);
+	}
+	printf("\n");
+	for (int i = 0; i < 4; i++)
+	{
+		printf("%dX*%d \t", Nom_Copy.coef[i], Nom_Copy.power[i]);
+	}
+	printf("\n");
+
 
 }
