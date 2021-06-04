@@ -1,56 +1,61 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <stdarg.h>
-#include <string.h>
+#include <conio.h>
 
+
+
+// the number of terms you can add
+const int n = 20;
 typedef struct Poly
 {
 	// hard code 
-	int power[4];
-	int coef[4];
+	int power[n];
+	int coef[n];
 } Poly;
 
-void main()
+
+
+// takes Nominator and Dominator and prints the Long Division ==> Result and Remainder
+void LongDivision(Poly Nom, Poly Dom)
 {
-	// consider the power order by the highest for both nom and Dom
-	// as 2D array but with name to ease thinking 
-	Poly Nom = { {3,2,1,0}, {1,-12,38,-17} }; // x**3 - 12 X**2 + 38x -17 
-	Poly Nom_Copy = Nom; // x**3 - 12 X**2 + 38x -17 
-	Poly Dom = { {3,2,1,0},{0,0,1,-7} }; // x - 7
-	// hard code array replaced it by loops copy
-	Poly Dom_Copy = Dom;
-
-
-	Poly Division_Result,Remainder, divisor;
-	int Index_Highest_Dom_Power;
+	// initilizer 
+	Poly Remainder = Nom;
+	Poly Subtract = Dom;
+	Poly Division_Result, divisor;
+	int Index_Highest_Dom_Power = 0;;
 
 	// check the higest power in Dominator > highest power in Nominator  if true break;
-	if (Nom.coef[0] == 0 && Dom.coef[0] != 0 ) return;
+	if (Nom.coef[0] == 0 && Dom.coef[0] != 0) 
+	{ 
+		printf("Division Can`t Done");
+		return;
+	}
+	;
 
 	for (int i = 0; Dom.coef[i] == 0; i++)
 	{
-		Index_Highest_Dom_Power = i+1;
+		Index_Highest_Dom_Power = i + 1;
 	}
-	
+
 	// check the power of Nom of the 
-	for (int i = 0 , j = 0; Nom.power[i] >= Dom.power[Index_Highest_Dom_Power]  ; i++,j++)
+	for (int i = 0, j = 0; Nom.power[i] >= Dom.power[Index_Highest_Dom_Power]; i++, j++)
 	{
 		// hard code
-		int zeros[4] = {0};
+		int zeros[n] = { 0 };
 		// divisor that will be used in multiplication and Subtractor 
 		divisor.power[0] = Nom.power[i] - Dom.power[Index_Highest_Dom_Power];
 
-		// for first iterate it will be compared to Nom but later on the remainder of first iteration in Dom_Copy
+		// for first iterate it will be compared to Nom but later on the remainder of first iteration in Subtract
 		if (i == 0)
 		{
 			divisor.coef[0] = Nom.coef[i] / Dom.coef[Index_Highest_Dom_Power];
 			Division_Result.coef[j] = Nom.coef[i] / Dom.coef[Index_Highest_Dom_Power];
 
-		}			
+		}
 		else
 		{
-			divisor.coef[0] = Dom_Copy.coef[i] / Dom.coef[Index_Highest_Dom_Power];
+			divisor.coef[0] = Subtract.coef[i] / Dom.coef[Index_Highest_Dom_Power];
 			Division_Result.coef[j] = divisor.coef[0] / Dom.coef[Index_Highest_Dom_Power];
 
 
@@ -58,27 +63,22 @@ void main()
 
 		Division_Result.power[j] = Nom.power[i] - Dom.power[Index_Highest_Dom_Power];
 
-		
-		
-        //	Dom_Copy.coef  = divisor.coef[0] * Dom.coef
+
+
+		//	Subtract.coef  = divisor.coef[0] * Dom.coef
 		// hard code size
-		for (int z = 0; z < 4; z++)
+		for (int z = 0; z < n; z++)
 		{
 			// coff multiplyer
-			Dom_Copy.coef[z] = divisor.coef[0] * Dom.coef[z];
-	
+			Subtract.coef[z] = divisor.coef[0] * Dom.coef[z];
+
 		}
-		// {3,2,1,0} {0,0,1,-7} index = i to index = i + divisor.power[0]
-			// {3,2,1,0} {1,-7,0,0}
-			// {1,-12,38,-17}-{1,-7,0,0}
-		//	divisor.power[0] = 1
-		// z is hard code
 		// power multiplyer(shifting) which is can then be subtracted since we done both coef and power
-		for (int z = 0; z < 4; z++)
+		for (int z = 0; z < n; z++)
 		{
-			if (z + divisor.power[0] < 4) 
+			if (z + divisor.power[0] < n)
 			{
-				zeros[z] = Dom_Copy.coef[z + divisor.power[0]];
+				zeros[z] = Subtract.coef[z + divisor.power[0]];
 			}
 			else
 			{
@@ -88,31 +88,104 @@ void main()
 		}
 
 
-		for (int z = 0; z < 4; z++)
+		for (int z = 0; z < n; z++)
 		{
-			if (i == 0) 
+			if (i == 0)
 			{
-				Dom_Copy.coef[z] = Nom.coef[z] - zeros[z];
+				Subtract.coef[z] = Nom.coef[z] - zeros[z];
 			}
 			else
 			{
-				Dom_Copy.coef[z] = Nom_Copy.coef[z] - zeros[z];
+				Subtract.coef[z] = Remainder.coef[z] - zeros[z];
 			}
 
 		}
-		Nom_Copy = Dom_Copy;
+		Remainder = Subtract;
 
 	}
-	for (int i = 0; i < 4-(Nom.power[0]-Division_Result.power[0]); i++)
+	printf("Division Result = ");
+	for (int i = 0; i < n - (Nom.power[0] - Division_Result.power[0]); i++)
 	{
-		printf("%dX*%d \t", Division_Result.coef[i], Division_Result.power[i]);
+		if (Division_Result.coef[i] == 0) continue;
+		printf("%dX^%d  ", Division_Result.coef[i], Division_Result.power[i]);
+	}
+	printf("\nRemainder = ");
+
+	for (int i = 0; i < n; i++)
+	{
+		if (Remainder.coef[i] == 0) continue;
+		printf("%dX^%d ", Remainder.coef[i], Remainder.power[i]);
+		if(i<=n-2) printf(" + ");
+	}
+	printf("/ ");
+
+	for (int i = 0; i < n; i++)
+	{
+		if (Dom.coef[i] == 0) continue;
+		printf("%dX^%d ", Dom.coef[i], Dom.power[i]);
+		if (i <= n - 2) printf(" + ");
+	}
+
+	printf("\n");
+}
+
+void GetPower(Poly* Nom , Poly* Dom)
+{
+	for (int i = 0; i < n; i++)
+	{
+		Nom->power[i] = n - (i + 1);
+		Dom->power[i] = n - (i + 1);
+	}
+
+}
+
+void GetInputs(Poly* Nom, Poly* Dom) 
+{
+	int Heigest_power_Nominator = 0;
+	int Heigest_power_Dominator = 0;
+
+	printf("Enter the Heigest power of Nominator : ");
+	fscanf_s(stdin, "%d", &Heigest_power_Nominator);
+	printf("\n");
+	printf("Enter the Heigest power of Dominator : ");
+	fscanf_s(stdin, "%d", &Heigest_power_Dominator);
+	printf("\n");
+
+
+	// Get the Coefs of  nominator  
+	printf("Enter the Coef of Nominator : ");
+	for (int i = 0; i <= Heigest_power_Nominator; i++)
+	{
+		fscanf_s(stdin, "%d", &Nom->coef[n - (i + 1)]);
+		if (i == Heigest_power_Nominator) break;
+
+
+
 	}
 	printf("\n");
-	for (int i = 0; i < 4; i++)
+	// Get the Coefs of  nominator  
+
+	printf("Enter the Coef of Dominator : ");
+	for (int i = 0; i <= Heigest_power_Dominator; i++)
 	{
-		printf("%dX*%d \t", Nom_Copy.coef[i], Nom_Copy.power[i]);
+		fscanf_s(stdin, "%d", &Dom->coef[n - (i + 1)]);
+		if (i == Heigest_power_Nominator) break;
+
+
 	}
 	printf("\n");
+}
+
+void main()
+{
+	// consider the power order by the highest for both nom and Dom
+	// as 2D array but with name to ease thinking 
+	Poly Nom = { {0}, {0} };
+	Poly Dom = { {0},{0} };
+	GetPower(&Nom, &Dom);
+	GetInputs(&Nom, &Dom);
+
+	LongDivision(Nom, Dom);
 
 
 }
